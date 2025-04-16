@@ -12,7 +12,7 @@ interface RichEditorHelp {
     fun setNumberedList()
     fun setCheckBox()
     fun clearFormats()
-    fun getHtml(): String
+    fun getHtml(): String?
     fun setHtml(html: String)
 
 }

@@ -45,8 +45,7 @@ class RichEditorHelpIml(private val editor: RichEditor): RichEditorHelp {
         editor.setHtml(updatedHtml)
     }
 
-
-    override fun getHtml(): String {
+    override fun getHtml(): String? {
         return editor.html
     }
 

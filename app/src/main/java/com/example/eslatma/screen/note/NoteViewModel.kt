@@ -18,15 +18,17 @@ interface NoteViewModel {
     val setBackgroundLiveData: LiveData<Int>
     val clearOldStateLiveData: LiveData<Unit>
     val showBottomSheetLiveData: LiveData<Unit>
-    val setColorLiveData: LiveData<Int>
+    val setColorLiveData: LiveData<Pair<Int,Int>>
+    val setDataLiveData: LiveData<String>
+    val showToast: LiveData<String>
 
 
 
 
     fun openMainScreen()
-    fun saveNote(title: String)
+    fun saveNote(title: String, color: Int)
     fun setId(id: Int)
-    fun updateNote(id: Int, title: String)
+    fun updateNote(id: Int, title: String, colorId: Int)
     fun showBottomSheet()
     fun deleteNote(id: Int)
     fun setColor(id: Int)
@@ -37,4 +39,5 @@ interface NoteViewModel {
     fun setNumberedList()
     fun setCheckbox()
     fun formatBtn(index: Int)
+    fun setData()
 }

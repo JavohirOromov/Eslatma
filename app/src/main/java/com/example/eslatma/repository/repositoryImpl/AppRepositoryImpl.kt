@@ -1,4 +1,5 @@
 
+import androidx.lifecycle.LiveData
 import com.example.eslatma.model.room.dao.NoteDao
 import com.example.eslatma.model.room.entity.NoteEntity
 import com.example.eslatma.repository.repository.AppRepository
@@ -40,7 +41,11 @@ class AppRepositoryImpl(private val noteDao: NoteDao): AppRepository {
        return noteDao.getNoteById(id)
     }
 
-    override fun getAllNotes(): List<NoteEntity> {
+    override fun getAllNotes(): LiveData<List<NoteEntity>> {
         return noteDao.getAllNotes()
+    }
+
+    override fun getSearchNotes(query: String): List<NoteEntity> {
+        return noteDao.getSearchNote(query)
     }
 }

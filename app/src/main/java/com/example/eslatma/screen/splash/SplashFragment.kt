@@ -7,7 +7,6 @@ import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.eslatma.R
 import com.example.eslatma.databinding.FragmentSplashBinding
-
 /**
  * Creator: Javohir Oromov
  * Project: Eslatma
@@ -22,9 +21,7 @@ class SplashFragment: Fragment(R.layout.fragment_splash) {
         super.onViewCreated(view, savedInstanceState)
 
         object: CountDownTimer(1500,3000){
-            override fun onTick(millisUntilFinished: Long) {
-
-            }
+            override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
                 findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToMainFragment())

@@ -13,9 +13,12 @@ interface MainViewModel {
     val openNoteLiveData: LiveData<Unit>
     val allNotesLiveData: LiveData<List<NoteEntity>>
     val updateNoteLiveData: LiveData<Int>
+    val searchQueryObserver: LiveData<List<NoteEntity>>
+    val setInputSearchQuery: LiveData<String>
 
 
     fun openNoteScreen()
-    fun allNotes()
     fun updateLiveData(id: Int)
+    fun searchQuery(query: String)
+    fun setVoiceResult(query: String)
 }

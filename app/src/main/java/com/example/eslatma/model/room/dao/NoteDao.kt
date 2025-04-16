@@ -1,4 +1,5 @@
 package com.example.eslatma.model.room.dao
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -26,7 +27,10 @@ interface NoteDao {
     @Query("select * from `Javohir's Notes` where id = :noteId")
     fun getNoteById(noteId: Int): NoteEntity
 
-    @Query("SELECT * FROM `Javohir's Notes` ORDER BY updateAt DESC")
-    fun getAllNotes(): List<NoteEntity>
+    @Query("SELECT * FROM `Javohir's Notes`")
+    fun getAllNotes(): LiveData<List<NoteEntity>>
 
+
+    @Query("SELECT * FROM `Javohir's Notes` WHERE title LIKE '%' || :st || '%' OR content LIKE '%' || :st || '%'")
+    fun getSearchNote(st: String): List<NoteEntity>
 }

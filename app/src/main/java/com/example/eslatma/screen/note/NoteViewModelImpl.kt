@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import com.example.eslatma.R
 import com.example.eslatma.model.room.entity.NoteEntity
 import com.example.eslatma.repository.repository.AppRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 /**
  * Creator: Javohir Oromov
  * Project: Eslatma
@@ -14,6 +17,7 @@ import com.example.eslatma.repository.repository.AppRepository
  * Javohir's MacBook Air
  */
 class NoteViewModelImpl(private val editorHelper: RichEditorHelp): NoteViewModel, ViewModel() {
+    private var data: String = ""
     private val repository: AppRepository = AppRepositoryImpl.getInstance()
     override val openMainLiveDate = MutableLiveData<Unit>()
     override val visibilityDeleteBtn = MutableLiveData<Boolean>()
@@ -24,20 +28,31 @@ class NoteViewModelImpl(private val editorHelper: RichEditorHelp): NoteViewModel
     override val setBackgroundLiveData = MutableLiveData<Int>()
     override val clearOldStateLiveData = MutableLiveData<Unit>()
     override val showBottomSheetLiveData = MutableLiveData<Unit>()
-    override val setColorLiveData = MutableLiveData<Int>()
+    override val setColorLiveData = MutableLiveData<Pair<Int,Int>>()
+    override val setDataLiveData = MutableLiveData<String>()
+    override val showToast = MutableLiveData<String>()
+
 
 
     override fun openMainScreen() {
         openMainLiveDate.value = Unit
     }
 
-    override fun saveNote(title: String) {
-        val content = editorHelper.getHtml()
-        val data = NoteEntity(0,title,content,"","", R.drawable.bg_3)
+    override fun saveNote(title: String, id: Int) {
+        val content = editorHelper.getHtml()?: ""
+        if (title.isEmpty()){
+            showToast.value = "Sarlavhani matnini kriting"
+            return
+        }
+        if (content.isEmpty()){
+            showToast.value = "Eslatma matnini kiriting"
+            return
+        }
+        Log.d("EEE","$id")
+        val data = NoteEntity(0,title,content,data,"", color(id))
         repository.addNote(data)
         openMainLiveDate.value = Unit
     }
-
     override fun setId(id: Int) {
         if (id != -1){
             visibilityDeleteBtn.value = true
@@ -52,9 +67,17 @@ class NoteViewModelImpl(private val editorHelper: RichEditorHelp): NoteViewModel
         }
     }
 
-    override fun updateNote(id: Int, title: String) {
-        val content = editorHelper.getHtml()
-        val data = NoteEntity(id,title,content,"","", R.drawable.bg_3)
+    override fun updateNote(id: Int, title: String, colorId: Int) {
+        val content = editorHelper.getHtml()?: ""
+        if (title.isEmpty()){
+            showToast.value = "Sarlavhani matnini kriting"
+            return
+        }
+        if (content.isEmpty() || content.contains("<br>")){
+            showToast.value = "Eslatma matnini kiriting"
+            return
+        }
+        val data = NoteEntity(id,title,content,data,"", if (colorId == -1) repository.getNoteById(id).background else color(colorId ))
         repository.updateNote(data)
         openMainLiveDate.value = Unit
     }
@@ -69,22 +92,24 @@ class NoteViewModelImpl(private val editorHelper: RichEditorHelp): NoteViewModel
         openMainLiveDate.value = Unit
     }
 
+
     override fun setColor(id: Int) {
         Log.d("WWW","$id")
         when(id){
-            0 -> setColorLiveData.value = R.drawable.bg_4
-            1 -> setColorLiveData.value = R.drawable.bg_5
-            2 -> setColorLiveData.value = R.drawable.bg_6
-            3 -> setColorLiveData.value = R.drawable.bg_7
-            4 -> setColorLiveData.value = R.drawable.bg_8
-            5 -> setColorLiveData.value = R.drawable.bg_9
-            6 -> setColorLiveData.value = R.drawable.bg_10
-            7 -> setColorLiveData.value = R.drawable.bg_11
-            8 -> setColorLiveData.value = R.drawable.bg_12
-            9 -> setColorLiveData.value = R.drawable.bg_13
-            10 -> setColorLiveData.value = R.drawable.bg_14
-            11 -> setColorLiveData.value = R.drawable.bg_15
-            12 -> setColorLiveData.value = R.drawable.bg_16
+            0 -> setColorLiveData.value = Pair(R.drawable.bg_4, 0)
+            1 -> setColorLiveData.value = Pair(R.drawable.bg_5, 1)
+            2 -> setColorLiveData.value = Pair(R.drawable.bg_6, 2)
+            3 -> setColorLiveData.value = Pair(R.drawable.bg_7, 3)
+            4 -> setColorLiveData.value = Pair(R.drawable.bg_8, 4)
+            5 -> setColorLiveData.value = Pair(R.drawable.bg_9, 5)
+            6 -> setColorLiveData.value = Pair(R.drawable.bg_10, 6)
+            7 -> setColorLiveData.value = Pair(R.drawable.bg_11, 7)
+            8 -> setColorLiveData.value = Pair(R.drawable.bg_12, 8)
+            9 -> setColorLiveData.value = Pair(R.drawable.bg_13, 9)
+            10 -> setColorLiveData.value = Pair(R.drawable.bg_14, 10)
+            11 -> setColorLiveData.value = Pair(R.drawable.bg_15, 11)
+            12 -> setColorLiveData.value = Pair(R.drawable.bg_16, 12)
+
         }
     }
 
@@ -136,5 +161,30 @@ class NoteViewModelImpl(private val editorHelper: RichEditorHelp): NoteViewModel
             }
         }
         setBackgroundLiveData.value = index
+    }
+
+    override fun setData() {
+        val sfd = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        setDataLiveData.value = sfd.format(Date())
+        data = sfd.format(Date())
+    }
+
+    private fun color(id: Int): Int{
+        return when(id){
+            0 -> R.drawable.bg_4
+            1 -> R.drawable.bg_5
+            2 -> R.drawable.bg_6
+            3 -> R.drawable.bg_7
+            4 -> R.drawable.bg_8
+            5 -> R.drawable.bg_9
+            6 -> R.drawable.bg_10
+            7 -> R.drawable.bg_11
+            8 -> R.drawable.bg_12
+            9 -> R.drawable.bg_13
+            10 -> R.drawable.bg_14
+            11 -> R.drawable.bg_15
+            12 -> R.drawable.bg_16
+            else -> R.drawable.bg_17
+        }
     }
 }

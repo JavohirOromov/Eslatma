@@ -1,4 +1,5 @@
 package com.example.eslatma.repository.repository
+import androidx.lifecycle.LiveData
 import com.example.eslatma.model.room.entity.NoteEntity
 
 /**
@@ -19,5 +20,7 @@ interface AppRepository {
 
     fun getNoteById(id: Int): NoteEntity
 
-    fun getAllNotes(): List<NoteEntity>
+    fun getAllNotes(): LiveData<List<NoteEntity>>
+
+    fun getSearchNotes(query: String): List<NoteEntity>
 }

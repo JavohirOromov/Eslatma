@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -31,14 +32,15 @@ class NoteFragment : Fragment(R.layout.fragment_note) {
     private lateinit var formatList: ArrayList<ImageButton>
     private val args: NoteFragmentArgs by navArgs()
     private val bottom by lazy { BottomSheet(requireContext()) }
+    private var colorId = -1
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(
-            this,
-            NoteViewModelFactory(binding.noteContent)
-        )[NoteViewModelImpl::class.java]
+        viewModel = ViewModelProvider(this, NoteViewModelFactory(binding.noteContent))[NoteViewModelImpl::class.java]
         viewModel.setId(args.id)
+        viewModel.setData()
+        viewModel.setDataLiveData.observe(viewLifecycleOwner,setDataLiveDataObserver)
         viewModel.openMainLiveDate.observe(requireActivity(), openMainObserver)
         viewModel.visibilitySaveBtn.observe(viewLifecycleOwner,visibilitySaveBtnObserver)
         viewModel.visibilityDeleteBtn.observe(viewLifecycleOwner,visibilityDeleteBtnObserver)
@@ -49,6 +51,7 @@ class NoteFragment : Fragment(R.layout.fragment_note) {
         viewModel.clearOldStateLiveData.observe(viewLifecycleOwner,clearOldStateObserver)
         viewModel.showBottomSheetLiveData.observe(viewLifecycleOwner,showBottomSheetObserver)
         viewModel.setColorLiveData.observe(viewLifecycleOwner,setColorObserver)
+        viewModel.showToast.observe(viewLifecycleOwner,showToastObserver)
         checkKeyboard()
         loadData()
         addClickEvents()
@@ -72,13 +75,14 @@ class NoteFragment : Fragment(R.layout.fragment_note) {
             viewModel.openMainScreen()
         }
         binding.save.setOnClickListener {
-            viewModel.saveNote(binding.noteTitle.text.toString())
+            Log.d("EEE","$colorId")
+            viewModel.saveNote(binding.noteTitle.text.toString(),colorId)
         }
         binding.delete.setOnClickListener {
             viewModel.deleteNote(args.id)
         }
         binding.update.setOnClickListener {
-            viewModel.updateNote(args.id,binding.noteTitle.text.toString())
+            viewModel.updateNote(args.id,binding.noteTitle.text.toString(),colorId)
         }
         for (i in 0 until binding.liner.childCount){
             binding.liner.getChildAt(i).setOnClickListener {
@@ -140,9 +144,10 @@ class NoteFragment : Fragment(R.layout.fragment_note) {
     private val showBottomSheetObserver = Observer<Unit>{
         bottom.show()
     }
-    private val setColorObserver = Observer<Int>{
-        Log.d("QQQ","$it")
-        binding.root.setBackgroundResource(it)
+    private val setColorObserver = Observer<Pair<Int,Int>>{ pair ->
+        val (drawableId, colorId) = pair
+        this.colorId = colorId
+        binding.root.setBackgroundResource(drawableId)
     }
     private fun checkKeyboard() {
         binding.noteTitle.setOnFocusChangeListener { _, hasFocus ->
@@ -185,7 +190,12 @@ class NoteFragment : Fragment(R.layout.fragment_note) {
         }
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
     }
-
+    private val setDataLiveDataObserver = Observer<String>{
+        binding.date.text = it
+    }
+    private val showToastObserver = Observer<String>{
+        Toast.makeText(requireContext(),it,Toast.LENGTH_SHORT).show()
+    }
     private fun getNavigationBarHeight(context: Context): Int {
         val resources = context.resources
         val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
